@@ -112,24 +112,40 @@ public class FullScreenPlugin extends CordovaPlugin
 	}
 	
 	/**
+	 * Check if basic features are supported (internal use, no callback)
+	 */
+	protected boolean isSupportedInternal()
+	{
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+	}
+
+	/**
 	 * Are any of the features of this plugin supported?
 	 */
 	protected boolean isSupported()
 	{
-		boolean supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-		
+		boolean supported = isSupportedInternal();
+
         PluginResult res = new PluginResult(PluginResult.Status.OK, supported);
         context.sendPluginResult(res);
 		return supported;
 	}
-	
+
+	/**
+	 * Check if immersive mode is supported (internal use, no callback)
+	 */
+	protected boolean isImmersiveModeSupportedInternal()
+	{
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+	}
+
 	/**
 	 * Is immersive mode supported?
 	 */
 	protected boolean isImmersiveModeSupported()
 	{
-		boolean supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-		
+		boolean supported = isImmersiveModeSupportedInternal();
+
         PluginResult res = new PluginResult(PluginResult.Status.OK, supported);
         context.sendPluginResult(res);
 		return supported;
@@ -198,7 +214,7 @@ public class FullScreenPlugin extends CordovaPlugin
 	 */
 	protected boolean leanMode()
 	{
-		if (!isSupported())
+		if (!isSupportedInternal())
 		{
 			context.error("Not supported");
 			return false;
@@ -260,38 +276,35 @@ public class FullScreenPlugin extends CordovaPlugin
 	 */
 	protected boolean showSystemUI()
 	{
-		if (!isSupported())
+		if (!isSupportedInternal())
 		{
 			context.error("Not supported");
 			return false;
 		}
-		
+
 		activity.runOnUiThread(new Runnable()
 		{
 			@Override
-			public void run() 
+			public void run()
 			{
 				try
 				{
 					resetWindow();
-			        
+
 					// Remove translucent theme from bars
-					
+
 					window.clearFlags
 					(
-						WindowManager.LayoutParams.FLAG_FULLSCREEN 
-						| WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION 
+						WindowManager.LayoutParams.FLAG_FULLSCREEN
+						| WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
 						| WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
 					);
-					
+
 			        // Update system UI
-					
+
 					decorView.setOnSystemUiVisibilityChangeListener(null);
 					decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-					
-					PluginResult res = new PluginResult(PluginResult.Status.OK, true);
-			        context.sendPluginResult(res);
-					
+
 					context.success();
 				}
 				catch (Exception e)
@@ -299,17 +312,17 @@ public class FullScreenPlugin extends CordovaPlugin
 					context.error(e.getMessage());
 				}
 			}
-		});			
-		
+		});
+
 		return true;
 	}
-	
+
 	/**
 	 * Extend your app underneath the status bar (Android 4.4+ only)
 	 */
 	protected boolean showUnderStatusBar()
 	{
-		if (!isImmersiveModeSupported())
+		if (!isImmersiveModeSupportedInternal())
 		{
 			context.error("Not supported");
 			return false;
@@ -379,7 +392,7 @@ public class FullScreenPlugin extends CordovaPlugin
 	 */
 	protected boolean showUnderSystemUI()
 	{
-		if (!isImmersiveModeSupported())
+		if (!isImmersiveModeSupportedInternal())
 		{
 			context.error("Not supported");
 			return false;
@@ -424,7 +437,7 @@ public class FullScreenPlugin extends CordovaPlugin
 	 */
 	protected boolean immersiveMode()
 	{
-		if (!isImmersiveModeSupported())
+		if (!isImmersiveModeSupportedInternal())
 		{
 			context.error("Not supported");
 			return false;
@@ -485,7 +498,7 @@ public class FullScreenPlugin extends CordovaPlugin
 	
 	protected boolean setSystemUiVisibility(final int visibility)
 	{
-		if (!isSupported())
+		if (!isSupportedInternal())
 		{
 			context.error("Not supported");
 			return false;
